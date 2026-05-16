@@ -1,0 +1,33 @@
+{
+  "name": "lustra",
+  "version": "0.1.0",
+  "description": "Code-hygiene skill for AI coding agents: clean AI slop, find security flaws, dead code, dependency rot, lint, format, review, and project structure.",
+  "license": "MIT",
+  "author": "Henrique Breim <henrique@breim.com.br>",
+  "keywords": [
+    "agent-skill",
+    "claude-code",
+    "code-quality",
+    "security",
+    "dead-code",
+    "lint"
+  ],
+  "bin": {
+    "lustra": "bin/lustra.js"
+  },
+  "files": [
+    "skill/",
+    "scripts/",
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node scripts/build.js",
+    "postinstall": "node scripts/postinstall.js",
+    "prepublishOnly": "node scripts/build.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
