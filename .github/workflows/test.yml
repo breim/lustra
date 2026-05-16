@@ -13,7 +13,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      - run: npm test
+          cache: npm
+      - run: npm ci
+      - run: npm run verify
       - name: source and generated dirs are in sync
         run: |
           npm run build
