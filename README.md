@@ -3,7 +3,7 @@
 The code-hygiene skill that makes your AI harness clean up its own slop. 1 skill,
 15 commands wrapping real tooling, from first commit to technical due diligence.
 
-> Install with `npx skills add breim/lustra`, or `npm i -g lustra` for a global skill.
+> Install with `npx skills add breim/lustra`, or `npm i -g lustra-cli` for a global skill.
 
 ## Why Lustra?
 
@@ -73,7 +73,7 @@ Via npm — a global install auto-detects which clients you already use (any of
 `~/.opencode`, `~/.qoder`, `~/.agents`) and installs the skill for those:
 
 ```sh
-npm i -g lustra
+npm i -g lustra-cli
 lustra help
 ```
 
