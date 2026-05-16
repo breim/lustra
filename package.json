@@ -4,6 +4,12 @@
   "description": "Code-hygiene skill for AI coding agents: clean AI slop, find security flaws, dead code, dependency rot, lint, format, review, and project structure.",
   "license": "MIT",
   "author": "Henrique Breim <henrique@breim.com.br>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/breim/lustra.git"
+  },
+  "homepage": "https://github.com/breim/lustra#readme",
+  "bugs": "https://github.com/breim/lustra/issues",
   "keywords": [
     "agent-skill",
     "claude-code",

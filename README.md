@@ -49,6 +49,10 @@ lustra help
 
 `lustra install` reinstalls the skill; `lustra build` regenerates the per-harness dirs.
 
+> The installed `~/.claude/skills/lustra/` and `~/.agents/skills/lustra/` are a **managed
+> mirror**: every global install and every `lustra install` replaces them wholesale. Do
+> not hand-edit them — change `skill/` and rebuild.
+
 ## For contributors
 
 `skill/` is the **single source of truth** — `skill/SKILL.md` (the router) and
