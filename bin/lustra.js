@@ -39,6 +39,23 @@ function ask(question) {
   );
 }
 
+function parseSelection(answer, detected) {
+  const a = (answer || "").trim();
+  if (!a) {
+    return detected && detected.length
+      ? detected
+      : resolveProviders(["claude-code"]);
+  }
+  if (a.toLowerCase() === "all") return providers;
+  return a.split(",").map((tok) => {
+    const t = tok.trim();
+    if (/^\d+$/.test(t) && providers[Number(t) - 1]) {
+      return providers[Number(t) - 1];
+    }
+    return resolveProviders([t])[0];
+  });
+}
+
 async function pickInteractive() {
   const detected = detectInstalledProviders();
   console.log("Available clients:");
@@ -53,14 +70,7 @@ async function pickInteractive() {
     `Install for which clients? numbers/names comma-separated, "all", ` +
       `Enter = ${def}: `
   );
-  if (!answer) return resolveProviders(def.split(","));
-  if (answer.toLowerCase() === "all") return providers;
-  return answer.split(",").map((tok) => {
-    const t = tok.trim();
-    const byIndex = providers[Number(t) - 1];
-    if (/^\d+$/.test(t) && byIndex) return byIndex;
-    return resolveProviders([t])[0];
-  });
+  return parseSelection(answer, detected);
 }
 
 async function runInstall() {
@@ -84,17 +94,18 @@ async function runInstall() {
   report(installSkill(selected), selected);
 }
 
-if (command === "install") {
-  runInstall().catch((err) => {
-    console.error(`lustra: ${err.message}`);
-    process.exit(1);
-  });
-} else if (command === "build") {
-  execFileSync("node", [path.join(__dirname, "..", "scripts", "build.js")], {
-    stdio: "inherit",
-  });
-} else {
-  console.log(`lustra — code-hygiene skill for AI coding agents
+function main() {
+  if (command === "install") {
+    runInstall().catch((err) => {
+      console.error(`lustra: ${err.message}`);
+      process.exit(1);
+    });
+  } else if (command === "build") {
+    execFileSync("node", [path.join(__dirname, "..", "scripts", "build.js")], {
+      stdio: "inherit",
+    });
+  } else {
+    console.log(`lustra — code-hygiene skill for AI coding agents
 
 Usage:
   lustra help                       Show this message
@@ -121,4 +132,9 @@ Skill commands (inside your agent):
   /lustra docs        Documentation drift and gaps
   /lustra ci          Pipeline soundness
   /lustra structure   Detect the stack, advise or reorganize`);
+  }
 }
+
+if (require.main === module) main();
+
+module.exports = { parseSelection };

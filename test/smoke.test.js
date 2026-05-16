@@ -93,3 +93,39 @@ test("lustra install --all installs every provider; unknown client fails", () =>
   );
   fs.rmSync(home, { recursive: true, force: true });
 });
+
+test("lustra build via CLI regenerates every provider dir", () => {
+  runNode(bin, ["build"], {});
+  for (const { configDir } of providers) {
+    assert.ok(
+      fs.existsSync(path.join(root, configDir, "skills", "lustra", "SKILL.md")),
+      configDir
+    );
+  }
+});
+
+test("parseSelection resolves answers without a TTY", () => {
+  const { parseSelection } = require("../bin/lustra.js");
+  const ids = (sel) => sel.map((p) => p.provider);
+
+  assert.deepEqual(ids(parseSelection("", [])), ["claude-code"]);
+  assert.deepEqual(ids(parseSelection("  ", [])), ["claude-code"]);
+  assert.deepEqual(ids(parseSelection("", [providers[1]])), [providers[1].provider]);
+  assert.equal(parseSelection("all", []).length, providers.length);
+  assert.equal(parseSelection("ALL", []).length, providers.length);
+  assert.deepEqual(ids(parseSelection("cursor,gemini", [])), ["cursor", "gemini"]);
+  assert.deepEqual(ids(parseSelection("1,4", [])), [
+    providers[0].provider,
+    providers[3].provider,
+  ]);
+  assert.throws(() => parseSelection("nope", []), /unknown client/);
+});
+
+test("lustra help lists every command and client", () => {
+  const out = runNode(bin, ["help"], {});
+  for (const { provider } of providers) assert.match(out, new RegExp(provider));
+  const commands = fs
+    .readdirSync(path.join(root, "skill", "reference"))
+    .map((f) => f.replace(/\.md$/, ""));
+  for (const cmd of commands) assert.match(out, new RegExp(`/lustra ${cmd}\\b`));
+});
