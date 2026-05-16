@@ -68,17 +68,29 @@ Via the skills CLI — installs into your agent's skill directory:
 npx skills add breim/lustra
 ```
 
-Via npm — a global install drops the skill into `~/.claude/skills/lustra/` and
-`~/.agents/skills/lustra/`:
+Via npm — a global install auto-detects which clients you already use (any of
+`~/.claude`, `~/.cursor`, `~/.gemini`, `~/.codex`, `~/.github`, `~/.kiro`,
+`~/.opencode`, `~/.qoder`, `~/.agents`) and installs the skill for those:
 
 ```sh
 npm i -g lustra
 lustra help
 ```
 
-> The installed skill dirs are a **managed mirror**: every global install and every
-> `lustra install` replaces them wholesale. Do not hand-edit them — change `skill/` and
-> rebuild. A non-global `npm install` does **not** touch your home directories.
+Pick clients explicitly at any time:
+
+```sh
+lustra install                       # auto-detect, or prompt when run in a terminal
+lustra install --all                 # every supported client
+lustra install --client claude-code,cursor
+```
+
+Supported clients: Claude Code, Cursor, Gemini CLI, Codex CLI, VS Code Copilot,
+Kiro, OpenCode, Qoder, plus the generic `agents` standard.
+
+> The installed skill dirs are a **managed mirror**: every install replaces them
+> wholesale. Do not hand-edit them — change `skill/` and rebuild. A non-global
+> `npm install` does **not** touch your home directories.
 
 ## Usage
 
@@ -96,9 +108,11 @@ Invoke the skill with a command and an optional target. No target means the whol
 ## CLI
 
 ```sh
-lustra help       # commands and install targets
-lustra install    # (re)install the skill into your home agent dirs
-lustra build      # regenerate the per-harness skill directories
+lustra help                        # commands and supported clients
+lustra install                     # install: auto-detect, or prompt in a terminal
+lustra install --all               # install for every supported client
+lustra install --client a,b        # install for specific clients
+lustra build                       # regenerate the per-harness skill directories
 ```
 
 ## Supported Tools

@@ -9,42 +9,87 @@ const root = path.join(__dirname, "..");
 const providers = require("../scripts/providers");
 const refCount = fs.readdirSync(path.join(root, "skill", "reference")).length;
 
+const postinstall = path.join(root, "scripts", "postinstall.js");
+const bin = path.join(root, "bin", "lustra.js");
+
+function tmpHome(prefix) {
+  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+}
+function skillDir(home, configDir) {
+  return path.join(home, configDir, "skills", "lustra");
+}
+function runNode(file, args, env) {
+  return execFileSync("node", [file, ...args], {
+    env: { ...process.env, ...env },
+    encoding: "utf8",
+  });
+}
+
 test("build produces SKILL.md + every reference file for each provider", () => {
   execFileSync("node", [path.join(root, "scripts", "build.js")], { cwd: root });
   for (const { configDir } of providers) {
     const dir = path.join(root, configDir, "skills", "lustra");
     assert.ok(fs.existsSync(path.join(dir, "SKILL.md")), `${configDir} SKILL.md`);
-    const refs = fs.readdirSync(path.join(dir, "reference"));
-    assert.equal(refs.length, refCount, `${configDir} reference count`);
+    assert.equal(
+      fs.readdirSync(path.join(dir, "reference")).length,
+      refCount,
+      `${configDir} reference count`
+    );
   }
 });
 
-test("postinstall installs to home only when global, and is idempotent", () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "lustra-g-"));
-  const env = { ...process.env, HOME: home, npm_config_global: "true" };
-  delete env.CI;
-  const claudeSkill = path.join(home, ".claude", "skills", "lustra", "SKILL.md");
+test("global postinstall with nothing detected falls back to Claude Code, idempotent", () => {
+  const home = tmpHome("lustra-g-");
+  const env = { HOME: home, npm_config_global: "true", CI: "" };
 
-  execFileSync("node", [path.join(root, "scripts", "postinstall.js")], { env });
-  assert.ok(fs.existsSync(claudeSkill), "installed on first global run");
-  const before = fs.readdirSync(path.join(home, ".claude", "skills", "lustra", "reference")).length;
+  runNode(postinstall, [], env);
+  assert.ok(fs.existsSync(path.join(skillDir(home, ".claude"), "SKILL.md")));
+  assert.ok(!fs.existsSync(skillDir(home, ".cursor")), "no client we don't use");
+  const n1 = fs.readdirSync(path.join(skillDir(home, ".claude"), "reference")).length;
 
-  execFileSync("node", [path.join(root, "scripts", "postinstall.js")], { env });
-  const after = fs.readdirSync(path.join(home, ".claude", "skills", "lustra", "reference")).length;
-  assert.equal(after, before, "idempotent on second run");
+  runNode(postinstall, [], env);
+  const n2 = fs.readdirSync(path.join(skillDir(home, ".claude"), "reference")).length;
+  assert.equal(n2, n1, "idempotent");
 
   fs.rmSync(home, { recursive: true, force: true });
 });
 
-test("postinstall does not touch home on a non-global install", () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "lustra-l-"));
-  const env = { ...process.env, HOME: home };
-  delete env.CI;
-  delete env.npm_config_global;
+test("global postinstall installs only for detected clients", () => {
+  const home = tmpHome("lustra-d-");
+  fs.mkdirSync(path.join(home, ".cursor"), { recursive: true });
 
-  execFileSync("node", [path.join(root, "scripts", "postinstall.js")], { env });
-  assert.ok(!fs.existsSync(path.join(home, ".claude")), "no .claude written");
-  assert.ok(!fs.existsSync(path.join(home, ".agents")), "no .agents written");
+  runNode(postinstall, [], { HOME: home, npm_config_global: "true", CI: "" });
+  assert.ok(fs.existsSync(path.join(skillDir(home, ".cursor"), "SKILL.md")));
+  assert.ok(!fs.existsSync(skillDir(home, ".claude")), "undetected client skipped");
 
+  fs.rmSync(home, { recursive: true, force: true });
+});
+
+test("non-global install does not touch home", () => {
+  const home = tmpHome("lustra-l-");
+  const out = runNode(postinstall, [], { HOME: home, CI: "", npm_config_global: "" });
+  assert.ok(!fs.existsSync(path.join(home, ".claude")));
+  assert.match(out, /local install/);
+  fs.rmSync(home, { recursive: true, force: true });
+});
+
+test("lustra install --client installs the named clients only", () => {
+  const home = tmpHome("lustra-c-");
+  runNode(bin, ["install", "--client", "claude-code,cursor"], { HOME: home });
+  assert.ok(fs.existsSync(path.join(skillDir(home, ".claude"), "SKILL.md")));
+  assert.ok(fs.existsSync(path.join(skillDir(home, ".cursor"), "SKILL.md")));
+  assert.ok(!fs.existsSync(skillDir(home, ".gemini")));
+  fs.rmSync(home, { recursive: true, force: true });
+});
+
+test("lustra install --all installs every provider; unknown client fails", () => {
+  const home = tmpHome("lustra-a-");
+  runNode(bin, ["install", "--all"], { HOME: home });
+  for (const { configDir } of providers) {
+    assert.ok(fs.existsSync(path.join(skillDir(home, configDir), "SKILL.md")), configDir);
+  }
+  assert.throws(() =>
+    runNode(bin, ["install", "--client", "nope"], { HOME: tmpHome("lustra-x-") })
+  );
   fs.rmSync(home, { recursive: true, force: true });
 });
