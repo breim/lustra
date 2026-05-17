@@ -23,7 +23,8 @@ stylistic preferences the repo's own config does not enforce.
 
 ## Fix policy
 
-- Auto: `eslint --fix` for the autofixable set, then re-run to confirm zero regressions.
+- Present the autofixable set as a checklist (rule + `file:line` per item). On approval,
+  run `eslint --fix` scoped to the approved files, then re-run to confirm zero regressions.
 - Propose (diff + ask): every slop-smell change — these are semantic. Match existing
   style; do not reformat untouched lines.
 
