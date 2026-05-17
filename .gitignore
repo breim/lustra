@@ -1,2 +1,12 @@
 node_modules/
 *.tgz
+
+# Generated skill targets — source of truth is skill/, dogfooded via .agents/
+.claude/skills/lustra/
+.cursor/skills/lustra/
+.gemini/skills/lustra/
+.codex/skills/lustra/
+.github/skills/lustra/
+.kiro/skills/lustra/
+.opencode/skills/lustra/
+.qoder/skills/lustra/
