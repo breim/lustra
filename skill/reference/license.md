@@ -7,10 +7,15 @@ project's own license at risk.
 
 1. Read the project's declared license from the manifest. If absent, that is itself a
    top finding.
-2. Enumerate dependency licenses: `npx -y license-checker --json` (or the pnpm/yarn
-   equivalent), including transitive. For non-JS stacks use the stack's tool
-   (`pip-licenses`, `go-licenses`, `cargo about`) if present; otherwise read manifests
-   and state the result is partial.
+2. Enumerate dependency licenses (including transitive) with the stack's tool (SKILL.md
+   § Stack detection). If none is present, read manifests and state the result is partial:
+
+   | Stack | Tool |
+   | --- | --- |
+   | JS/TS | `npx -y license-checker --json` (or the pnpm/yarn equivalent) |
+   | Python | `pip-licenses --format=json` |
+   | Go | `go-licenses report ./...` |
+   | Rust | `cargo about generate` (or `cargo-license`) |
 3. Flag: copyleft (GPL/AGPL/LGPL) reaching a proprietary or permissively-licensed
    project, packages with **no** license or `UNLICENSED`, custom/unrecognized licenses,
    and missing attribution for licenses that require it (BSD/MIT/Apache NOTICE).
@@ -26,10 +31,25 @@ recommend counsel for blocking cases.
 ## Fix policy
 
 - Auto: nothing. License changes are decisions, not edits.
-- Propose (diff + ask): replacing a problematic package with a compatibly-licensed
-  equivalent, or adding the required attribution/NOTICE file.
+- Present remediable items as an itemized checklist — per item: the package, its license,
+  the risk, and the proposed action (replace with a named compatibly-licensed equivalent,
+  or add the required attribution/NOTICE entry). Apply only approved items; Confirmation
+  flow per SKILL.md. Blocking legal-exposure items are flagged for counsel, not "fixed".
 
 ## Report
 
-Project license, the dependency-license matrix grouped by risk tier, blocking items
-called out first, and explicit "needs legal review" flags. State coverage gaps.
+```
+License — <target>
+
+Project license: <id or "MISSING — top finding">
+
+Blocking
+  - <package> <license> — <exposure> — needs legal review
+
+Matrix (grouped by risk tier)
+  Copyleft/risk   <package> <license> runtime|dev   <action>
+  Attribution     ...
+  Clear           <count> permissive-on-permissive
+
+Coverage gaps: <what could not be enumerated and why>
+```

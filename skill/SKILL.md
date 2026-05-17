@@ -1,8 +1,8 @@
 ---
 name: lustra
-description: "Use when the user wants to clean up AI slop, harden a codebase, or run technical due diligence: review code for security flaws and vulnerable or wrongly-licensed dependencies, find and remove dead code, audit dependency health, run and triage linters, type checkers, test suites and Prettier, find performance smells, check documentation and CI health, scaffold baseline configs for the detected stack, do a structured code review, fix project structure, or produce one aggregated health report across all of these. Triggers on phrases like clean this up, find security issues, remove dead code, check dependencies, lint, typecheck, run the tests, format, review my code, check licenses, is this slow, fix the project structure, set up the project, audit everything, due diligence, or this looks like AI slop. Wraps real tools (npm audit, knip, eslint, tsc, the test runner, prettier, npm outdated, license-checker) and triages their output. Not for UI/visual design work."
+description: "Use when the user wants to clean up AI slop, harden a codebase, or run technical due diligence: review code for security flaws and vulnerable or wrongly-licensed dependencies, find and remove dead code, audit dependency health, run and triage linters, type checkers, test suites and formatters, evaluate design principles (SOLID and the cohesion/coupling equivalents for non-OO stacks), audit logging and observability, find performance smells, check documentation and CI health, scaffold baseline configs for the detected stack, do a structured code review, guide a one-major-at-a-time dependency migration, fix project structure, or produce one aggregated health report across all of these. Triggers on phrases like clean this up, find security issues, remove dead code, check dependencies, lint, typecheck, run the tests, format, review my code, check the design, check logging, is this slow, migrate a dependency, fix the project structure, set up the project, audit everything, due diligence, or this looks like AI slop. Wraps the detected stack's real tooling — dependency auditor, linter, type checker, test runner, formatter, dead-code and license scanners — and triages its output. Not for UI/visual design work."
 user-invocable: true
-argument-hint: "[audit|security|license|libs|types|tests|deadcode|lint|review|perf|structure|docs|ci|prettier|baseline] [target]"
+argument-hint: "[audit|baseline|review|types|tests|analyze|format|security|license|deadcode|deps|design|observability|perf|docs|migrate|ci|structure] [target]"
 allowed-tools: Bash Read Edit Grep Glob
 ---
 
@@ -31,20 +31,25 @@ Grouped by lifecycle phase. `audit` runs the diagnostic ones together.
 
 **Iterate**
 - `review` — structured correctness / design / slop review of a diff or path.
-- `types` — type-checker triage; catch `any`/`@ts-ignore` evasion.
+- `types` — type-checker triage; catch `any`/`@ts-ignore`-style evasion.
 - `tests` — run the suite, coverage on the diff, catch fake/empty tests.
-- `lint` — ESLint plus AI-slop smells that no rule catches.
-- `prettier` — formatting drift.
+- `analyze` — the linter's findings plus AI-slop smells that no rule catches.
+- `format` — formatting drift, fixed mechanically.
 
 **Polish**
 - `security` — vulnerabilities: secrets, injection, broken authorization, vulnerable deps.
 - `license` — dependency license compatibility and IP risk.
-- `deadcode` — unused files, exports, and dependencies (knip).
-- `libs` — dependency health: outdated, deprecated, duplicated, unused.
+- `deadcode` — unused files, exports, and dependencies; deletes only what is confirmed.
+- `deps` — dependency health and upgrades: outdated, deprecated, duplicated. Reports
+  unused deps and advisories but defers deletion to `deadcode` and vuln fixes to `security`.
+- `design` — module/package design quality: SOLID, or cohesion/coupling/composition for
+  non-OO stacks. Module-scoped, unlike diff-scoped `review` or layout-scoped `structure`.
+- `observability` — logging and instrumentation quality so failures are diagnosable.
 - `perf` — performance smells: N+1, blocking IO, unbounded growth, bundle weight.
 - `docs` — documentation drift and undocumented public surface.
 
 **Maintain**
+- `migrate` — guided one-major-at-a-time dependency migration: changelog, codemods, suite.
 - `ci` — pipeline soundness: real gates, CI security, reproducibility.
 - `structure` — detect the stack, then report or reorganize project structure.
 
@@ -77,3 +82,17 @@ redefine it:
    skipped, and why.
 
 Read-only detection is exempt. Changing files or dependencies is not.
+
+## Stack detection
+
+Every command that runs a tool first identifies the stack. Reference files point here and
+do not redefine this:
+
+1. Read the manifests at the target root to identify language and framework:
+   `package.json` (and the framework), `pyproject.toml`/`setup.py`, `go.mod`,
+   `Cargo.toml`, `pom.xml`/`build.gradle`, `Gemfile`, `composer.json`.
+2. State the detected stack explicitly before running anything. If detection is ambiguous
+   or the repo is polyglot, ask rather than assume.
+3. Pick the tool from the reference file's per-ecosystem table. If no tool exists for the
+   detected stack, say so and fall back to static reading — mark that result
+   lower-confidence. Never run a stack's tool against a project that is not that stack.

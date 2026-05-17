@@ -3,15 +3,12 @@
 **Purpose:** detect the stack, judge its structure against that stack's conventions, then
 either advise or reorganize — the user's choice.
 
-## Detect the stack
+## Detect
 
-Read manifests at the target root to identify language and framework: `package.json`
-(and which framework — Next.js, etc.), `pyproject.toml`/`setup.py`, `go.mod`,
-`Cargo.toml`, `pom.xml`/`build.gradle`, `Gemfile`, `composer.json`. Note the build tool,
-test runner, and module system. State the detected stack explicitly before judging
-anything — if detection is ambiguous, ask rather than assume.
+Detect the stack (SKILL.md § Stack detection). Additionally note the build tool, test
+runner, and module system, since structure is judged against *that* stack's conventions.
 
-## Assess
+## Triage
 
 Against the conventions of the *detected* stack (not a generic ideal), report:
 
@@ -23,7 +20,7 @@ Against the conventions of the *detected* stack (not a generic ideal), report:
 
 Be concrete: name the file, the convention it violates, the expected location.
 
-## Then offer two paths
+## Fix policy
 
 Present both and let the user pick:
 

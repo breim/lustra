@@ -10,7 +10,8 @@
    do they **fail** the job (not `|| true`, not `continue-on-error` masking failures)?
 3. Security/hygiene: secrets echoed into logs, untrusted PR code running with secrets,
    unpinned third-party actions (`@main`), missing least-privilege `permissions`,
-   no dependency/lockfile install integrity (`npm ci` vs `npm install`).
+   no deterministic lockfile install (the stack's frozen-install mode, e.g. `npm ci`,
+   `pip install --require-hashes`, `go mod download` + verify, `cargo build --locked`).
 4. Reproducibility: pinned toolchain versions, cache keyed correctly, deterministic
    install from the lockfile.
 
@@ -23,10 +24,21 @@ pipeline that *looks* green while enforcing nothing — call it out first.
 ## Fix policy
 
 - Auto: nothing — CI changes affect every future build.
-- Propose (diff + ask): the specific workflow edit (add the failing gate, pin the action,
-  scope `permissions`, switch to `npm ci`), one concern per change, with the risk it closes.
+- Present the fixes as an itemized checklist, one concern per item: the specific workflow
+  edit (add the failing gate, pin the action, scope `permissions`, switch to a frozen
+  install) with the risk it closes. Apply only approved items; Confirmation flow per
+  SKILL.md.
 
 ## Report
 
-Pipeline inventory, gate analysis (what is enforced vs. claimed), security/reproducibility
-findings — each with the proposed config change.
+```
+CI — <target>
+
+Pipeline inventory: <workflows / jobs found, or "none — top finding">
+
+Gate analysis
+  <check> enforced|claimed-only|absent   <evidence>
+
+Security/reproducibility
+  - <finding> — <risk> — proposed config change
+```

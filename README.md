@@ -1,7 +1,7 @@
 # Lustra
 
 The code-hygiene skill that makes your AI harness clean up its own slop. 1 skill,
-15 commands wrapping real tooling, from first commit to technical due diligence.
+18 commands wrapping real tooling, from first commit to technical due diligence.
 
 > Install with `npx skills add breim/lustra`, or `npm i -g lustra-cli` for a global skill.
 
@@ -11,14 +11,15 @@ AI writes code that runs and looks fine and is quietly wrong: dead abstractions,
 error handling, tests that assert nothing, dependencies nobody uses, a green pipeline that
 gates nothing. Linters catch a slice of it. The rest needs judgment on top of real tools.
 
-Lustra runs the actual tooling — `npm audit`, `knip`, `eslint`, `tsc`, your test runner,
-`prettier`, `license-checker` — then triages the output: filters false positives, ranks by
-real risk, fixes only what is mechanically safe, and proposes the rest as a diff. It does
-not guess where a tool would. It runs the tool and applies judgment.
+Lustra detects your stack and runs its actual tooling — the dependency auditor, linter,
+type checker, test runner, formatter, dead-code and license scanners — then triages the
+output: filters false positives, ranks by real risk, fixes only what is mechanically
+safe, and proposes the rest as a diff. It does not guess where a tool would. It runs the
+tool and applies judgment.
 
 ## What's Included
 
-15 commands under one skill, mapped to a project lifecycle. `audit` runs the diagnostic
+18 commands under one skill, mapped to a project lifecycle. `audit` runs the diagnostic
 ones together for a one-shot health report.
 
 | Phase | Command | What it does |
@@ -26,16 +27,19 @@ ones together for a one-shot health report.
 | start | `audit`     | One graded health report across every dimension (due diligence) |
 | start | `baseline`  | Scaffold the guardrail configs for the detected stack |
 | iterate | `review`  | Structured correctness / design / slop review of a diff or path |
-| iterate | `types`   | Type-checker triage; catch `any`/`@ts-ignore` evasion |
+| iterate | `types`   | Type-checker triage; catch `any`/`@ts-ignore`-style evasion |
 | iterate | `tests`   | Run the suite, coverage on the diff, catch fake/empty tests |
-| iterate | `lint`    | ESLint plus AI-slop smells no rule catches |
-| iterate | `prettier`| Formatting drift, fixed mechanically |
+| iterate | `analyze` | The linter's findings plus AI-slop smells no rule catches |
+| iterate | `format`  | Formatting drift, fixed mechanically |
 | polish | `security` | Exploitable defects: secrets, injection, authz, vulnerable deps |
 | polish | `license`  | Dependency license compatibility and IP risk |
 | polish | `deadcode` | Unused files, exports, dependencies — confirmed before deletion |
-| polish | `libs`     | Dependency health: outdated, deprecated, duplicated, unused |
+| polish | `deps`     | Dependency health and upgrades: outdated, deprecated, duplicated |
+| polish | `design`   | Module/package design: SOLID, or cohesion/coupling for non-OO stacks |
+| polish | `observability` | Logging and instrumentation quality so failures are diagnosable |
 | polish | `perf`     | Performance smells: N+1, blocking IO, unbounded growth, bundle weight |
 | polish | `docs`     | Documentation drift and undocumented public surface |
+| maintain | `migrate` | Guided one-major-at-a-time dependency migration with codemods |
 | maintain | `ci`     | Pipeline soundness: real gates, CI security, reproducibility |
 | maintain | `structure` | Detect the stack, then advise or reorganize project structure |
 
@@ -50,11 +54,11 @@ maintain.**
 
 - **Start** — `audit` an inherited codebase to see what you really have; `baseline` a
   fresh one so it has guardrails from day one.
-- **Iterate** — while building, `review` the diff, then `types`, `tests`, `lint`,
-  `prettier` to keep the loop honest.
-- **Polish** — before shipping, harden it: `security`, `license`, `deadcode`, `libs`,
-  `perf`, `docs`.
-- **Maintain** — over time, `ci` and `structure` keep the project from rotting.
+- **Iterate** — while building, `review` the diff, then `types`, `tests`, `analyze`,
+  `format` to keep the loop honest.
+- **Polish** — before shipping, harden it: `security`, `license`, `deadcode`, `deps`,
+  `design`, `observability`, `perf`, `docs`.
+- **Maintain** — over time, `migrate`, `ci` and `structure` keep the project from rotting.
 
 For technical due diligence, `audit` is the answer: it runs security, license, supply
 chain, reliability, maintainability and bus-factor checks and grades each — without
@@ -117,11 +121,14 @@ lustra build                       # regenerate the per-harness skill directorie
 
 ## Supported Tools
 
-Lustra orchestrates tools you already use and stays out of the way when one is absent
-(it says so rather than guessing): `npm audit`, `knip`, `eslint`, `tsc`, the project's
-test runner (jest/vitest/mocha/pytest/…), `prettier`, `npm outdated`, `license-checker`,
-and `semgrep` when present. Non-JS stacks are detected and handled with their own tooling
-where available.
+Lustra detects the stack first, then orchestrates the tools you already use for it and
+stays out of the way when one is absent (it says so rather than guessing): the
+dependency-vulnerability scanner (`npm audit`/`pip-audit`/`govulncheck`/`cargo audit`),
+linter (ESLint/Ruff/`go vet`/Clippy), type checker (`tsc`/mypy/`go vet`/`cargo check`),
+test runner (jest/vitest/pytest/`go test`/`cargo test`), formatter
+(Prettier/Black/`gofmt`/`rustfmt`), dead-code and license scanners, and `semgrep` when
+present. Each command's reference file carries its own per-ecosystem tool table; an
+unknown stack falls back to static reading, flagged as lower-confidence.
 
 ## Contributing
 

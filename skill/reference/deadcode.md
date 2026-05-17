@@ -4,15 +4,23 @@
 
 ## Detect
 
-1. `npx -y knip --reporter json`, scoped to the target if knip supports the workspace.
-   If a `knip.json` exists, use it; do not overwrite it.
-2. If knip cannot run (no Node project / unsupported stack), fall back to: build the
-   import graph for the target with Grep/Glob and flag exported symbols and files with
-   zero inbound references. State clearly this fallback is lower confidence.
+Detect the stack (SKILL.md § Stack detection), then run its dead-code tool scoped to the
+target:
+
+| Stack | Tool |
+| --- | --- |
+| JS/TS | `npx -y knip --reporter json` (honor an existing `knip.json`; do not overwrite) |
+| Python | `vulture` (or `ruff check --select F401,F811`) |
+| Go | `staticcheck ./...` (unused) and `go vet ./...` |
+| Rust | `cargo +nightly udeps` if present; otherwise compiler `dead_code` warnings |
+
+If no tool exists for the stack, fall back to building the import graph for the target
+with Grep/Glob and flagging exported symbols and files with zero inbound references.
+State clearly this fallback is lower confidence.
 
 ## Triage
 
-knip over-reports across these categories — review each before acting:
+these tools over-report across these categories — review each before acting:
 
 - **Unused files / exports:** confirm there is no dynamic import, string-keyed require,
   framework convention (route/page files), or barrel re-export reaching them.

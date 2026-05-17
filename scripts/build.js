@@ -4,6 +4,7 @@ const providers = require('./providers')
 
 const root = path.join(__dirname, '..')
 const source = path.join(root, 'skill')
+const outRoot = process.env.LUSTRA_BUILD_ROOT || root
 
 if (!fs.existsSync(path.join(source, 'SKILL.md'))) {
   console.error('skill/SKILL.md not found — nothing to build')
@@ -11,7 +12,7 @@ if (!fs.existsSync(path.join(source, 'SKILL.md'))) {
 }
 
 for (const { configDir, displayName } of providers) {
-  const dest = path.join(root, configDir, 'skills', 'lustra')
+  const dest = path.join(outRoot, configDir, 'skills', 'lustra')
   fs.rmSync(dest, { recursive: true, force: true })
   fs.mkdirSync(dest, { recursive: true })
   fs.cpSync(source, dest, { recursive: true })

@@ -22,10 +22,23 @@ critical paths. A green suite full of fake assertions is a **red** finding, stat
 ## Fix policy
 
 - Auto: nothing. Tests are semantic.
-- Propose (diff + ask): the missing test cases (real assertions on real behavior, error
-  and edge paths), and removal of fake/skipped tests with the reason for each.
+- Present an itemized checklist: each proposed new test case (target file, the behavior
+  it asserts, error/edge path covered) and each fake/skipped test to remove with its
+  reason. Apply only approved items; Confirmation flow per SKILL.md.
 
 ## Report
 
-Suite status, uncovered changed lines (`file:line`), fake/skipped tests with evidence,
-then the proposed test additions ranked by risk.
+```
+Tests — <target>
+
+Suite: pass|fail|cannot-run   <counts or the blocking reason>
+
+Uncovered changed lines
+  <file:line> — <what is untested>
+
+Fake/skipped
+  <file:line> — <evidence>
+
+Proposed additions (ranked by risk)
+  <target> — <behavior to assert>
+```

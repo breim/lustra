@@ -4,6 +4,38 @@ All notable changes to this project are documented in this file. The format is b
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-05-17
+
+### Added
+
+- `design` command: paradigm-aware module/package design review — SOLID for OO stacks,
+  cohesion/coupling/composition for Go, Rust, and functional ones. Module-scoped, distinct
+  from diff-scoped `review` and layout-scoped `structure`.
+- `observability` command: logging and instrumentation quality — swallowed errors,
+  secrets/PII in logs, missing error context, absent metrics on critical paths.
+- `migrate` command: guided one-major-at-a-time dependency migration with changelog
+  reading, codemods, and isolated verification.
+- `SKILL.md` gains a shared Stack detection section; reference files point to it instead
+  of assuming a Node project.
+- `LUSTRA_BUILD_ROOT` override in `scripts/build.js` to direct generated provider
+  directories elsewhere.
+
+### Changed
+
+- Renamed `lint` → `analyze`, `prettier` → `format`, `libs` → `deps` (the last with a
+  sharpened scope: health and upgrades only — deletion is `deadcode`, vulnerability
+  remediation is `security`, major upgrades are `migrate`).
+- Decoupled the skill from the JS/npm ecosystem: every tool-running command now carries a
+  per-ecosystem tool table (Node/Python/Go/Rust) with an explicit fallback, instead of
+  hardcoding `eslint`/`prettier`/`npm`/`knip`. Now 18 commands.
+- Normalized every reference file to the same structure (Purpose / Detect / Triage /
+  Fix policy / Report) and updated `README.md`, `SKILL.md`, and the package description.
+
+### Fixed
+
+- Smoke tests no longer write provider directories into the repository working tree;
+  builds under test target a temporary directory.
+
 ## [0.1.1] - 2026-05-17
 
 ### Changed
