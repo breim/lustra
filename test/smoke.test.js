@@ -26,9 +26,13 @@ function runNode(file, args, env) {
 }
 
 test('build produces SKILL.md + every reference file for each provider', () => {
-  execFileSync('node', [path.join(root, 'scripts', 'build.js')], { cwd: root })
+  const out = tmpHome('lustra-build-')
+  execFileSync('node', [path.join(root, 'scripts', 'build.js')], {
+    cwd: root,
+    env: { ...process.env, LUSTRA_BUILD_ROOT: out }
+  })
   for (const { configDir } of providers) {
-    const dir = path.join(root, configDir, 'skills', 'lustra')
+    const dir = path.join(out, configDir, 'skills', 'lustra')
     assert.ok(
       fs.existsSync(path.join(dir, 'SKILL.md')),
       `${configDir} SKILL.md`
@@ -114,10 +118,11 @@ test('lustra install --all installs every provider; unknown client fails', () =>
 })
 
 test('lustra build via CLI regenerates every provider dir', () => {
-  runNode(bin, ['build'], {})
+  const out = tmpHome('lustra-cli-build-')
+  runNode(bin, ['build'], { LUSTRA_BUILD_ROOT: out })
   for (const { configDir } of providers) {
     assert.ok(
-      fs.existsSync(path.join(root, configDir, 'skills', 'lustra', 'SKILL.md')),
+      fs.existsSync(path.join(out, configDir, 'skills', 'lustra', 'SKILL.md')),
       configDir
     )
   }
@@ -152,4 +157,42 @@ test('lustra help lists every command and client', () => {
     .readdirSync(path.join(root, 'skill', 'reference'))
     .map(f => f.replace(/\.md$/, ''))
   for (const cmd of commands) assert.match(out, new RegExp(`/lustra ${cmd}\\b`))
+})
+
+test('tool-running commands stay stack-agnostic (no regression to JS-only)', () => {
+  const skill = path.join(root, 'skill')
+  const skillMd = fs.readFileSync(path.join(skill, 'SKILL.md'), 'utf8')
+  assert.match(
+    skillMd,
+    /## Stack detection/,
+    'SKILL.md must define the shared Stack detection contract'
+  )
+
+  const toolCommands = [
+    'analyze',
+    'format',
+    'deps',
+    'deadcode',
+    'security',
+    'license'
+  ]
+  for (const cmd of toolCommands) {
+    const md = fs.readFileSync(
+      path.join(skill, 'reference', `${cmd}.md`),
+      'utf8'
+    )
+    assert.match(
+      md,
+      /Stack detection/,
+      `${cmd}.md must reference Stack detection`
+    )
+    assert.match(md, /\|\s*-+\s*\|/, `${cmd}.md must carry a tool table`)
+    for (const stack of ['Python', 'Go', 'Rust']) {
+      assert.match(
+        md,
+        new RegExp(`\\b${stack}\\b`),
+        `${cmd}.md must cover ${stack}, not just JS`
+      )
+    }
+  }
 })
