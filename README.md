@@ -125,14 +125,18 @@ where available.
 
 ## Contributing
 
-`skill/` is the **single source of truth** — `skill/SKILL.md` (the router) and
-`skill/reference/*.md` (one file per command). `npm run build` compiles it into the
-committed per-harness directories (`.claude/`, `.agents/`, `.cursor/`, `.gemini/`,
-`.github/`) via `scripts/providers.js`. Edit `skill/`, never the generated dirs, then
-rebuild and commit. `npm test` runs the smoke suite.
+`skill/` is the **single source of truth** and the only skill content tracked in git —
+`skill/SKILL.md` (the router) and `skill/reference/*.md` (one file per command). Edit
+`skill/`, nothing else. `npm run build` compiles it into the per-harness directories
+(`.claude/`, `.agents/`, `.cursor/`, `.gemini/`, `.github/`, …) via
+`scripts/providers.js`; those dirs are gitignored — local artifacts for dogfooding this
+repo and for the smoke suite (`npm test` runs `build` itself).
 
-Publishing: push to the public `breim/lustra` repo, `npm run build`, commit the generated
-dirs, `npm publish --access public`. skills.sh discovery is automatic via the skills CLI.
+Publishing: push to the public `breim/lustra` repo, bump the version, and
+`npm publish --access public` (`prepublishOnly` runs `build`). The npm `files` whitelist
+ships only `skill/` — the generated per-harness dirs are never published. At install time
+`scripts/install-skill.js` copies `skill/` into the user's selected clients; skills.sh
+discovery is automatic via the skills CLI.
 
 ## License
 

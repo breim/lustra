@@ -18,8 +18,8 @@ source, not format).
 
 ## Fix policy
 
-- Auto: `prettier --write` on the drifted files. This is the canonical mechanically-safe
-  fix (rule 2). Re-run `--check` to confirm clean.
+- Present the drifted files as an itemized checklist (rule 2). On approval, run
+  `prettier --write` on the approved subset only, then re-run `--check` to confirm clean.
 - Never hand-edit formatting or "tidy" code Prettier did not flag.
 
 ## Report

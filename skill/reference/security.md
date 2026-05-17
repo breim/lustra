@@ -25,8 +25,8 @@ A transitive advisory with no exploit path is noted, not raised to critical.
 
 ## Fix policy
 
-- Auto: bump a vulnerable dependency only when the audit reports a non-breaking fixed
-  range and a lockfile exists; show the version delta.
+- Present each vulnerable-dependency bump as a checklist item (package, version delta,
+  advisory, breaking? y/n). Apply only the approved bumps.
 - Propose (diff + ask): code changes for injection/authz/deserialization, any major
   version bump, removing a committed secret (also state it must be rotated, not just
   deleted).

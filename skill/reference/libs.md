@@ -22,7 +22,8 @@ Group every dependency into one of:
 
 ## Fix policy
 
-- Auto: the **Safe** batch, only with a lockfile, showing every version delta.
+- Present the **Safe** group as a checklist (each package + version delta); apply only
+  the approved items, only with a lockfile.
 - Propose (diff + ask): **Review**, **Major**, **Remove**, **Replace** — one logical
   change per step, never a blanket bump.
 

@@ -10,7 +10,7 @@ allowed-tools: Bash Read Edit Grep Glob
 
 Lustra wraps real code-hygiene tooling and applies judgment on top of it. It does not
 guess where a tool would. It runs the tool, filters false positives, ranks what matters,
-and fixes only what is safe to fix automatically.
+and applies only the changes the user approves.
 
 ## Dispatch
 
@@ -54,11 +54,26 @@ These come from the project's own engineering guidelines and are not negotiable:
 
 1. **Surgical.** Every changed line must trace to the requested command. Never "improve"
    adjacent code, comments, or formatting that the command did not target.
-2. **No silent scope changes.** Deleting code, moving files, or removing a dependency is a
-   scope decision. Auto-apply only mechanically-safe fixes (formatting, an unambiguously
-   unused import). For anything semantic, show the diff and ask first.
+2. **No silent changes — ever.** Nothing is auto-applied, not even mechanically-safe
+   formatting or an unambiguously unused import. Every change is presented as an itemized
+   checklist with its evidence/diff, and only the items the user approves are applied.
 3. **Report honestly.** If a tool is missing, a step was skipped, or a finding is
    low-confidence, say so plainly. Do not present a partial pass as a clean one.
 4. **English only**, in all output and any code or config you write.
-5. **Confirm before destructive or hard-to-reverse actions.** A staged plan with explicit
-   confirmation, never a bulk rewrite.
+5. **Confirm before any file or dependency change.** Not just destructive or
+   hard-to-reverse ones — every edit goes through the Confirmation flow below as a staged,
+   explicitly-confirmed checklist, never a bulk rewrite.
+
+## Confirmation flow
+
+The single flow every command follows (the `deadcode` pattern). Reference files do not
+redefine it:
+
+1. Run the read-only detect/triage steps automatically — these never need confirmation.
+2. Present every proposed change as an itemized checklist: the `file`/target, the exact
+   action (command or diff), and the evidence/reason per item.
+3. Apply only the items the user approves, in one reviewable change.
+4. Re-run the relevant check to confirm clean, then report what was applied, what was
+   skipped, and why.
+
+Read-only detection is exempt. Changing files or dependencies is not.
