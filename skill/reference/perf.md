@@ -12,9 +12,16 @@ Static reading of the target (no synthetic benchmarking unless the user asks):
   caches with no eviction, recursion without a bound.
 - Repeated work: recomputation that could be hoisted/memoized, redundant re-renders
   (framework-specific), O(n²) where O(n) is trivial.
-- Bundle weight (front-end target): a heavy dependency used for one helper, a missing
-  dynamic import on a large rarely-used path. Use `npx -y source-map-explorer` /
-  bundler stats only if a build output exists.
+- Bundle weight (front-end stacks only, and only if a build output exists): a heavy
+  dependency used for one helper, a missing dynamic import on a large rarely-used path.
+
+| Stack | Bundle inspector |
+| --- | --- |
+| Webpack | `webpack-bundle-analyzer` on existing stats |
+| Vite/Rollup | `rollup-plugin-visualizer` output |
+| Any with source maps | `npx -y source-map-explorer` |
+
+Skip this step entirely for non-front-end stacks and say so.
 
 ## Triage
 
@@ -25,8 +32,9 @@ listing them. Flag only what you can name concretely (the loop, the query, the i
 ## Fix policy
 
 - Auto: nothing — perf changes alter behavior risk.
-- Propose (diff + ask): the specific transform (batch, hoist, paginate, lazy-load), with
-  the reason it is faster and any correctness caveat. One change per finding.
+- Present the transforms as an itemized checklist, one per finding: the specific change
+  (batch, hoist, paginate, lazy-load), why it is faster, and any correctness caveat.
+  Apply only approved items; Confirmation flow per SKILL.md.
 
 ## Report
 

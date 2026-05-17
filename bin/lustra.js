@@ -113,21 +113,24 @@ Usage:
 Clients: ${providers.map(p => p.provider).join(', ')}
 
 Skill commands (inside your agent):
-  /lustra audit       One graded health report (due diligence)
-  /lustra baseline    Scaffold guardrail configs for the stack
-  /lustra review      Structured review of a diff or path
-  /lustra types       Type-checker triage, catch evasion
-  /lustra tests       Run suite, diff coverage, catch fake tests
-  /lustra lint        ESLint + AI-slop smells
-  /lustra prettier    Fix formatting drift
-  /lustra security    Find exploitable security defects
-  /lustra license     Dependency license / IP risk
-  /lustra deadcode    Remove unused files, exports, dependencies
-  /lustra libs        Audit dependency health
-  /lustra perf        Performance smells
-  /lustra docs        Documentation drift and gaps
-  /lustra ci          Pipeline soundness
-  /lustra structure   Detect the stack, advise or reorganize`)
+  /lustra audit         One graded health report (due diligence)
+  /lustra baseline      Scaffold guardrail configs for the stack
+  /lustra review        Structured review of a diff or path
+  /lustra types         Type-checker triage, catch evasion
+  /lustra tests         Run suite, diff coverage, catch fake tests
+  /lustra analyze       Linter findings + AI-slop smells
+  /lustra format        Fix formatting drift
+  /lustra security      Find exploitable security defects
+  /lustra license       Dependency license / IP risk
+  /lustra deadcode      Remove unused files, exports, dependencies
+  /lustra deps          Dependency health and upgrades
+  /lustra design        Design quality: SOLID / cohesion / coupling
+  /lustra observability Logging and instrumentation quality
+  /lustra perf          Performance smells
+  /lustra docs          Documentation drift and gaps
+  /lustra migrate       Guided one-major dependency migration
+  /lustra ci            Pipeline soundness
+  /lustra structure     Detect the stack, advise or reorganize`)
   }
 }
 

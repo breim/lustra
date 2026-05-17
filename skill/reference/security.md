@@ -4,10 +4,16 @@
 
 ## Detect
 
-Run, scoped to the target:
+Detect the stack (SKILL.md § Stack detection). Run, scoped to the target:
 
-1. `npm audit --json` (or `pnpm audit --json` / `yarn npm audit --json` based on the
-   lockfile present). Skip with a note if there is no manifest.
+1. The stack's dependency-vulnerability scanner. Skip with a note if there is no manifest:
+
+   | Stack | Scanner |
+   | --- | --- |
+   | Node | `npm audit --json` (or `pnpm audit --json` / `yarn npm audit --json` per lockfile) |
+   | Python | `pip-audit --format json` |
+   | Go | `govulncheck ./...` |
+   | Rust | `cargo audit --json` |
 2. Secret sweep with Grep over the target: private keys (`BEGIN .* PRIVATE KEY`),
    AWS keys (`AKIA[0-9A-Z]{16}`), generic high-entropy assignments to names containing
    `secret|token|password|apikey`, and `.env` files committed alongside code.

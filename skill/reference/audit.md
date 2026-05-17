@@ -4,22 +4,25 @@
 dimension — the answer to "I inherited this code, what's here?" and to "is everything in
 order?" (technical due diligence).
 
-## Run
+## Detect
 
 Execute the other commands in **diagnostic mode only — detect and triage, do not fix
 anything**, in this order, and collect their findings:
 
 1. **Legal / risk:** `security`, `license`
-2. **Supply chain:** `libs`
+2. **Supply chain:** `deps`
 3. **Reliability:** `types`, `tests`
-4. **Maintainability:** `deadcode`, `lint`, `review`, `perf`
-5. **Bus factor / ops:** `structure`, `docs`, `ci`
+4. **Maintainability:** `deadcode`, `analyze`, `review`, `design`, `perf`
+5. **Bus factor / ops:** `structure`, `docs`, `observability`, `ci`
 
 Each runs over the whole target. Skip a dimension only if its tooling/stack is absent,
-and record the skip explicitly — a gap is a due-diligence finding, not a blank.
+and record the skip explicitly — a gap is a due-diligence finding, not a blank. If a
+dimension errors or times out, record it as Skipped with the reason and continue; a
+partial audit is reported as partial, never as a pass.
 
-`baseline` is **not** part of audit (it is generative, not diagnostic). If `baseline`
-would have lots to do, note "no project guardrails" under maintainability instead.
+`baseline` and `migrate` are **not** part of audit (they are generative, not
+diagnostic). If `baseline` would have lots to do, note "no project guardrails" under
+maintainability instead.
 
 ## Triage
 
