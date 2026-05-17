@@ -1,6 +1,6 @@
 {
   "name": "lustra-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Code-hygiene skill for AI coding agents: clean AI slop, find security flaws, dead code, dependency rot, lint, format, review, and project structure.",
   "license": "MIT",
   "author": "Henrique Breim <henrique@breim.com.br>",

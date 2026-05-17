@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file. The format is b
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-05-17
+
+### Changed
+
+- `prettier`, `lint`, `security`, and `libs` no longer auto-apply fixes. Every change is
+  now presented as an itemized checklist and only the approved subset is applied, matching
+  the `deadcode` flow. Read-only detection still runs automatically. `SKILL.md` gains a
+  shared Confirmation flow section and tighter rules 2 and 5.
+
 ## [0.1.0] - 2026-05-17
 
 Initial release.
